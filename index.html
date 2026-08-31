@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Claim Flow — Screen B</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f7;min-height:100vh}
+.wf{max-width:400px;margin:0 auto;position:relative}
+.screen{display:none;flex-direction:column;gap:14px}
+.screen.active{display:flex}
+.s-title{font-size:17px;font-weight:600;color:#1d1d1f;line-height:1.3}
+.s-sub{font-size:13px;color:#6e6e73;margin-top:3px;line-height:1.5}
+.card{background:#fff;border:1px solid #d2d2d7;border-radius:12px;overflow:hidden}
+.fl{font-size:12px;color:#6e6e73;margin-bottom:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.req{color:#c0392b;font-size:11px}
+.opt-lbl{font-size:11px;color:#aeaeb2}
+.fi{width:100%;border:1px solid #c7c7cc;border-radius:8px;padding:9px 11px;font-size:14px;color:#1d1d1f;background:#fff;appearance:none;-webkit-appearance:none}
+.fi:focus{outline:none;border-color:#1d1d1f}
+.fi-sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 10px) center;padding-right:28px}
+.field-group{padding:14px 16px;border-bottom:1px solid #e8e8ea}
+.field-group:last-child{border-bottom:none}
+.gr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11px;color:#aeaeb2;margin-top:4px}
+.btn{width:100%;padding:13px;background:#1d1d1f;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.btn:active{background:#3a3a3c}
+.back{font-size:12px;color:#6e6e73;cursor:pointer;background:none;border:none;padding:0;display:inline-flex;align-items:center;gap:3px}
+.cta-bar{position:sticky;bottom:0;background:#f5f5f7;padding:12px 16px;border-top:1px solid #e8e8ea}
+.screen-head{padding:12px 16px 0}
+
+/* SECTION HEADERS on long page */
+.sec-hdr{font-size:11px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.05em;padding:12px 16px 6px;background:#f5f5f7;border-bottom:1px solid #e8e8ea}
+
+/* LANDING */
+.landing-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border-bottom:1px solid #e8e8ea}
+.landing-logo-name{font-size:15px;font-weight:600;color:#1d1d1f}
+.landing-nav{display:flex;align-items:center;gap:14px}
+.landing-lang{font-size:13px;color:#3a3a3c;display:flex;align-items:center;gap:4px;cursor:pointer}
+.landing-menu{display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.landing-menu span{display:block;width:20px;height:2px;background:#1d1d1f;border-radius:2px}
+.landing-body{padding:20px 16px;display:flex;flex-direction:column;gap:14px}
+.landing-card{background:#fff;border-radius:14px;border:1px solid #d2d2d7;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+.landing-welcome{font-size:26px;font-weight:700;color:#1d1d1f}
+.landing-policy{font-size:13px;color:#6e6e73;line-height:1.7}
+.landing-btns{display:flex;flex-direction:column;gap:10px}
+
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center;padding:4px 20px 0;gap:0}
+.st{display:flex;align-items:center;flex:1;justify-content:center}
+.st-dot{width:24px;height:24px;border-radius:50%;border:2px solid #d2d2d7;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#aeaeb2;flex-shrink:0;z-index:1}
+.st.done .st-dot{background:#1d1d1f;border-color:#1d1d1f;color:#fff;font-size:11px}
+.st.act .st-dot{background:#fff;border-color:#1d1d1f}
+.st.act .st-dot::after{content:'';width:9px;height:9px;border-radius:50%;background:#1d1d1f;display:block}
+.st-line{flex:1;height:1.5px;background:#d2d2d7;max-width:60px}
+.st-line.done{background:#1d1d1f}
+.step-lbl{font-size:11px;color:#aeaeb2;text-align:center;margin-bottom:10px}
+
+/* SCOPE NOTICE */
+.scope-notice{background:#f5f5f7;border-radius:9px;padding:10px 13px;font-size:12px;color:#6e6e73;line-height:1.5;display:flex;align-items:flex-start;gap:8px;margin-top:6px}
+.scope-notice a{color:#1d1d1f;font-weight:500;text-decoration:underline;cursor:pointer}
+
+/* PROVIDER (recent dropdown) */
+.prov-result{padding:9px 12px;cursor:pointer;border-bottom:1px solid #e8e8ea}
+.prov-result:last-child{border:none}
+.prov-result:hover{background:#f5f5f7}
+.prov-result-name{font-size:13px;font-weight:500;color:#1d1d1f}
+.prov-result-addr{font-size:11px;color:#6e6e73}
+.prov-recent-hdr{font-size:10px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px 4px;background:#fafafa;border-bottom:1px solid #e8e8ea}
+
+/* UPLOAD */
+.upz{border:1.5px dashed #c7c7cc;border-radius:10px;padding:14px;text-align:center;background:#fafafa}
+.upz-lbl{font-size:12px;color:#6e6e73;margin-bottom:6px}
+.upz-btn{display:inline-block;padding:5px 14px;border:1px solid #c7c7cc;border-radius:7px;font-size:11px;cursor:pointer;color:#1d1d1f;background:#fff}
+.upz-ok{margin-top:6px;font-size:12px;color:#1a5c35;background:#f0faf4;padding:7px 10px;border-radius:7px;border:1px solid #a8ddb8;display:none;align-items:center;gap:6px}
+.upz-ok.vis{display:flex}
+
+/* Y/N TOGGLE */
+.toggle-pair{display:flex;gap:6px;flex-shrink:0}
+.tog{padding:7px 18px;border-radius:20px;border:1px solid #c7c7cc;font-size:13px;font-weight:500;cursor:pointer;color:#6e6e73;background:#fff}
+.tog.yes-sel{background:#1d1d1f;border-color:#1d1d1f;color:#fff}
+.tog.no-sel{background:#f0f0f2;border-color:#c7c7cc;color:#1d1d1f}
+
+/* AI ROWS + EXPAND */
+.ai-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ai-q-wrap{display:flex;align-items:flex-start;gap:6px;flex:1;padding-top:2px}
+.ai-q{font-size:14px;color:#1d1d1f;line-height:1.4}
+.expand-panel{background:#f9f9fb;border-top:1px solid #e8e8ea;padding:14px 16px;display:flex;flex-direction:column;gap:11px;margin:12px -16px -14px}
+.expand-panel.hidden{display:none}
+
+/* NOTICES */
+.notice-info{background:#eef4ff;border-radius:9px;padding:11px 13px;display:flex;gap:9px;align-items:flex-start}
+.notice-info .nt{font-size:12px;color:#1a3a6e;line-height:1.6}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:500;letter-spacing:.02em;line-height:1.4}
+.pill-dyn{background:#eef4ff;color:#1a4f8a;border:1px solid #c8daf7}
+
+/* ACK */
+.ack{display:flex;align-items:flex-start;gap:10px;padding:11px;background:#f5f5f7;border-radius:8px;font-size:12px;color:#6e6e73;line-height:1.5}
+
+/* SUCCESS */
+.tracker{position:relative;display:flex;padding:14px 16px;justify-content:space-between}
+.t-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:1;flex:1}
+.t-step:not(:first-child)::before{content:'';position:absolute;top:10px;left:calc(-50% + 12px);right:calc(50% + 12px);height:1.5px;background:#e8e8ea;z-index:0}
+.t-dot{width:22px;height:22px;border-radius:50%;background:#fff;border:1.5px solid #c7c7cc;display:flex;align-items:center;justify-content:center;font-size:10px;color:#aeaeb2;position:relative;z-index:1}
+.t-dot.act{background:#1d1d1f;border-color:#1d1d1f;color:#fff}
+.t-lbl{font-size:9px;color:#aeaeb2;text-align:center;line-height:1.2}
+.t-lbl.act{color:#1d1d1f;font-weight:500}
+.sec-lbl{font-size:11px;font-weight:500;color:#6e6e73;text-transform:uppercase;letter-spacing:.05em;padding:12px 16px 0}
+.pr-row{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid #e8e8ea;font-size:13px}
+.pr-row:last-child{border:none}
+.pr-k{color:#6e6e73}
+.pr-v{color:#1d1d1f;font-weight:500}
+</style>
+</head>
+<body>
+<div class="wf">
+
+<!-- ═══════════════ LANDING ═══════════════ -->
+<div id="s-landing" class="screen active" style="gap:0;min-height:100vh">
+  <div class="landing-header">
+    <span class="landing-logo-name"></span>
+    <div class="landing-nav">
+      <div class="landing-lang">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        English
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="landing-menu"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="landing-body">
+    <div class="landing-card">
+      <div>
+        <div class="landing-welcome">Welcome!</div>
+        <div class="landing-policy" style="margin-top:12px">
+          The Life Insurance Company of Canada<br>
+          Policy · Certificate
+        </div>
+      </div>
+      <div class="landing-btns">
+        <button class="btn" onclick="go('s-upload')">Submit a claim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ STEP 1: Upload receipt ═══════════════ -->
+<div id="s-upload" class="screen" style="gap:0;padding-bottom:100px">
+  <div class="screen-head">
+    <button class="back" onclick="go('s-landing')">← Back</button>
+    <div class="steps" style="margin:10px 0 4px">
+      <div class="st act"><div class="st-dot"></div></div>
+      <div class="st-line"></div>
+      <div class="st"><div class="st-dot"></div></div>
+    </div>
+    <div class="step-lbl">Step 1 of 2 — Upload receipt</div>
+    <div class="s-title" style="padding-bottom:6px">Upload your receipt</div>
+    <div class="s-sub" style="padding-bottom:14px">Attach the receipt for the expense you're claiming.</div>
+  </div>
+  <div class="card" style="margin:0 16px">
+    <div class="field-group" style="border-bottom:none">
+      <div class="fl">Receipt <span class="req">required</span></div>
+      <div class="upz">
+        <div class="upz-lbl">Attach your receipt</div>
+        <div class="upz-btn" onclick="markUploaded('rec-ok');enable('upload-cta')">Browse files</div>
+      </div>
+      <div id="rec-ok" class="upz-ok">✓ Receipt uploaded</div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e8e8ea;font-size:12px;color:#6e6e73;line-height:1.6">
+        <div style="font-weight:500;color:#3a3a3c;margin-bottom:6px">Tips for uploading</div>
+        <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px">
+          <li>Keep the originals until your claim is confirmed</li>
+          <li>Files supported: PDF, JPG, PNG, DOC (max 10 MB each, 20 MB total)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cta-bar">
+    <button class="btn" id="upload-cta" onclick="go('s-form')" disabled style="opacity:.4;pointer-events:none">Continue</button>
+  </div>
+</div>
+
+<!-- ═══════════════ STEP 2: One long page ═══════════════ -->
+<div id="s-form" class="screen" style="gap:0;padding-bottom:100px">
+  <div class="screen-head">
+    <button class="back" onclick="go('s-upload')">← Back</button>
+    <div class="steps" style="margin:10px 0 4px">
+      <div class="st done"><div class="st-dot">✓</div></div>
+      <div class="st-line done"></div>
+      <div class="st act"><div class="st-dot"></div></div>
+    </div>
+    <div class="step-lbl">Step 2 of 2 — Claim details</div>
+    <div class="s-title" style="padding-bottom:14px">Claim details</div>
+  </div>
+
+  <!-- SINGLE LONG CARD WITH EVERYTHING -->
+  <div class="card" style="margin:0 16px">
+
+    <!-- SECTION: Basic info -->
+    <div class="sec-hdr">Claim information</div>
+    <div class="field-group">
+      <div class="fl">Select account <span class="req">*</span></div>
+      <select class="fi fi-sel">
+        <option value="">Choose…</option>
+        <option>Group benefits plan</option>
+        <option>Health Care Spending Account (HCSA)</option>
+        <option>Taxable Spending Account (TSA)</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="fl">Who is this claim for? <span class="req">*</span></div>
+      <select class="fi fi-sel">
+        <option>Sarah Johnson (you)</option>
+        <option>Mark Johnson (spouse)</option>
+        <option>Emma Johnson (child)</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="fl">Benefit type <span class="req">*</span></div>
+      <select class="fi fi-sel">
+        <option value="">Select</option>
+        <option value="health">Health</option>
+        <option value="dental">Dental</option>
+        <option value="drugs">Drugs</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="fl">Service type <span class="req">*</span></div>
+      <select class="fi fi-sel">
+        <option value="">Select</option>
+        <option value="massage">Massage Therapy</option>
+        <option value="physio">Physiotherapy</option>
+        <option value="acupuncture">Acupuncture</option>
+        <option value="chiro">Chiropractic</option>
+        <option value="mental">Mental health</option>
+      </select>
+      <div class="scope-notice">
+        <span style="flex-shrink:0;margin-top:1px">💡</span>
+        <span>Not listed? Use the <a onclick="alert('Redirecting to Classic claim submission…')">Classic claim submission ↗</a> — more services coming here soon.</span>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="gr2">
+        <div>
+          <div class="fl">Treatment date <span class="req">*</span></div>
+          <input class="fi" type="date" id="tx-date"/>
+        </div>
+        <div>
+          <div class="fl">Length <span class="req">*</span></div>
+          <select class="fi fi-sel"><option value="">Select</option><option>30 min</option><option>45 min</option><option>60 min</option><option>90 min</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="fl">Expense amount <span class="req">*</span></div>
+      <input class="fi" placeholder="e.g. $120.00"/>
+      <div class="hint">Enter the total amount shown on your receipt</div>
+    </div>
+
+    <!-- SECTION: Provider -->
+    <div class="sec-hdr">Provider</div>
+    <div class="field-group">
+      <div>
+        <div class="fl">Clinic name <span class="req">*</span></div>
+        <div style="position:relative">
+          <input class="fi" id="prov-name" placeholder="e.g. Sunrise Wellness Centre" oninput="provSearch(this.value)" onfocus="provFocus()" autocomplete="off"/>
+          <div id="prov-results" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:50;background:#fff;border:1px solid #d2d2d7;border-radius:8px;overflow:hidden;display:none;box-shadow:0 4px 16px rgba(0,0,0,.08)"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px"><div class="fl">Practitioner name <span class="req">*</span></div><input class="fi" id="prov-practitioner" placeholder="e.g. Dr. Jane Smith"/></div>
+      <div style="margin-top:10px"><div class="fl">Address <span class="req">*</span></div><input class="fi" id="prov-address" placeholder="Street address, City, Province"/></div>
+    </div>
+
+    <!-- SECTION: Coordination of benefits -->
+    <div class="sec-hdr">Coordination of benefits</div>
+    <div class="field-group">
+      <div class="ai-row-top">
+        <div class="ai-q-wrap">
+          <span class="ai-q">Is this claim covered by another benefits plan?</span>
+        </div>
+        <div class="toggle-pair">
+          <div class="tog" id="cob-yes" onclick="pickToggle('cob','yes')">Yes</div>
+          <div class="tog no-sel" id="cob-no" onclick="pickToggle('cob','no')">No</div>
+        </div>
+      </div>
+      <div id="cob-expand" class="expand-panel hidden">
+        <div>
+          <div class="fl">Person with other coverage <span class="req">*</span></div>
+          <select class="fi fi-sel"><option value="">Select name</option><option>Sarah Johnson</option><option>Mark Johnson</option></select>
+        </div>
+        <div>
+          <div class="fl">Amount paid by other plan <span class="req">*</span></div>
+          <input class="fi" placeholder="$0.00"/>
+        </div>
+        <div>
+          <div class="fl">Explanation of Benefits (EOB) <span class="req">*</span></div>
+          <div class="upz"><div class="upz-lbl">Attach EOB from your other insurer</div><div class="upz-btn">Browse files</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Additional info (MVA, WSIB inline) -->
+    <div class="sec-hdr">Additional information</div>
+
+    <!-- MVA -->
+    <div class="field-group">
+      <div class="ai-row-top">
+        <div class="ai-q-wrap">
+          <span class="ai-q">Is this expense related to a motor vehicle accident (MVA)?</span>
+        </div>
+        <div class="toggle-pair">
+          <div class="tog" id="mva-yes" onclick="pickToggle('mva','yes')">Yes</div>
+          <div class="tog no-sel" id="mva-no" onclick="pickToggle('mva','no')">No</div>
+        </div>
+      </div>
+      <div id="mva-expand" class="expand-panel hidden">
+        <div>
+          <div class="fl">Date of accident <span class="req">*</span></div>
+          <input class="fi" type="date" id="accident-date"/>
+        </div>
+        <div class="notice-info">
+          <span style="font-size:15px;flex-shrink:0;margin-top:1px">ℹ️</span>
+          <div class="nt">If your accident was within the last 90 days, your auto insurance should cover these expenses first.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WSIB -->
+    <div class="field-group">
+      <div class="ai-row-top">
+        <div class="ai-q-wrap">
+          <span class="ai-q">Is this expense related to a workplace injury or illness?</span>
+        </div>
+        <div class="toggle-pair">
+          <div class="tog" id="wsib-yes" onclick="pickToggle('wsib','yes')">Yes</div>
+          <div class="tog no-sel" id="wsib-no" onclick="pickToggle('wsib','no')">No</div>
+        </div>
+      </div>
+      <div id="wsib-expand" class="expand-panel hidden">
+        <div class="notice-info">
+          <span style="font-size:15px;flex-shrink:0;margin-top:1px">ℹ️</span>
+          <div class="nt"><strong>Your WSIB/WCB may need to review this claim first.</strong> If already denied, upload the denial letter below.</div>
+        </div>
+        <div>
+          <div class="fl">WSIB/WCB denial letter <span class="opt-lbl">optional</span></div>
+          <div class="upz"><div class="upz-lbl">Upload denial letter</div><div class="upz-btn">Browse files</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Payment direction -->
+    <div class="sec-hdr">Payment direction</div>
+    <div class="field-group">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="radio" name="pay-dir" style="margin-top:3px;flex-shrink:0"/>
+          <span style="font-size:13.5px;color:#1d1d1f;line-height:1.5">Group benefits plan only</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="radio" name="pay-dir" style="margin-top:3px;flex-shrink:0"/>
+          <span style="font-size:13.5px;color:#1d1d1f;line-height:1.5">Group benefits plan first, and the balance paid from my Health Care Spending Account</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="radio" name="pay-dir" style="margin-top:3px;flex-shrink:0"/>
+          <span style="font-size:13.5px;color:#1d1d1f;line-height:1.5">My Health Care Spending Account only</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- SECTION: Documents -->
+    <div class="sec-hdr">Documents</div>
+    <div class="field-group" style="border-bottom:none">
+      <div class="fl">Referral <span class="opt-lbl">if applicable</span></div>
+      <div class="upz"><div class="upz-lbl">Attach referral if required by your plan</div><div class="upz-btn">Browse files</div></div>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <button class="btn" onclick="go('s-validate')">Continue</button>
+  </div>
+</div>
+
+<!-- ═══════════════ REVIEW & SUBMIT ═══════════════ -->
+<div id="s-validate" class="screen" style="gap:0;padding-bottom:100px">
+  <div class="screen-head">
+    <button class="back" onclick="go('s-form')">← Back</button>
+    <div class="s-title" style="padding:14px 0 14px">Review &amp; submit</div>
+  </div>
+
+  <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+    <div class="card"><div class="sec-lbl">Claim summary</div>
+      <div class="pr-row"><span class="pr-k">Massage Therapy — Harmony Wellness</span><span class="pr-v">$120.00</span></div>
+    </div>
+    <div class="card"><div class="sec-lbl">Attachments</div>
+      <a onclick="alert('Opening Receipt.pdf…')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;text-decoration:none;cursor:pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span style="font-size:13px;color:#185FA5;font-weight:500;flex:1">Receipt.pdf</span>
+        <span style="font-size:11px;color:#aeaeb2">View</span>
+      </a>
+    </div>
+    <div class="card"><div class="sec-lbl">Reimbursement to</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:8px;background:#f0f0f2;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏦</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#1d1d1f">Direct deposit</div>
+            <div style="font-size:11px;color:#6e6e73">Account ending ···· 4821</div>
+          </div>
+        </div>
+        <span onclick="alert('Change payment method…')" style="font-size:11px;color:#1d1d1f;cursor:pointer;font-weight:500">Change</span>
+      </div>
+    </div>
+    <div class="ack"><input type="checkbox" id="ack" style="margin-top:1px;flex-shrink:0"/><span>I confirm the information provided is accurate and complete. I understand that submitting false claims may result in termination of coverage and/or legal action under applicable Canadian law.</span></div>
+  </div>
+
+  <div class="cta-bar">
+    <button class="btn" onclick="go('s-done')">Submit claim</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SUCCESS ═══════════════ -->
+<div id="s-done" class="screen" style="gap:14px;padding:24px 16px">
+  <div style="text-align:center;padding:20px 0 4px">
+    <div style="width:56px;height:56px;border-radius:50%;background:#f0faf4;border:1px solid #a8ddb8;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px">✓</div>
+    <div class="s-title" style="text-align:center">Claim submitted!</div>
+  </div>
+  <div class="card"><div class="sec-lbl">Status &amp; next steps</div>
+    <div class="tracker">
+      <div class="t-step"><div class="t-dot act">✓</div><div class="t-lbl act">Approved</div></div>
+      <div class="t-step"><div class="t-dot">💳</div><div class="t-lbl">Paid</div></div>
+    </div>
+    <div style="padding:0 16px 14px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #e8e8ea;padding-top:12px;margin-top:4px">
+      <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#1d1d1f;flex-shrink:0">•</span><div style="font-size:12.5px;color:#3a3a3c;line-height:1.5">This claim will be paid within XX business days</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#1d1d1f;flex-shrink:0">•</span><div style="font-size:12.5px;color:#3a3a3c;line-height:1.5">Track status anytime in your Claim history</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="pr-row"><span class="pr-k">Claim reference</span><span class="pr-v">CLM-2026-08847</span></div>
+    <div class="pr-row"><span class="pr-k">Total amount</span><span class="pr-v">$120.00</span></div>
+    <div class="pr-row"><span class="pr-k">Reimbursed to</span><span class="pr-v">Direct deposit ···· 4821</span></div>
+    <div class="pr-row"><span class="pr-k">Confirmation sent to</span><span class="pr-v">sarah@email.com</span></div>
+  </div>
+  <button class="btn" onclick="go('s-landing');resetAll()">Back to home</button>
+</div>
+
+</div><!-- end .wf -->
+
+<script>
+/* ══════════════════ NAV ══════════════════ */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ══════════════════ UPLOAD GATE ══════════════════ */
+function markUploaded(id){document.getElementById(id).classList.add('vis');}
+function enable(id){
+  const b=document.getElementById(id);
+  b.removeAttribute('disabled');
+  b.style.opacity='1';
+  b.style.pointerEvents='auto';
+}
+function disable(id){
+  const b=document.getElementById(id);
+  if(!b)return;
+  b.setAttribute('disabled','');
+  b.style.opacity='.4';
+  b.style.pointerEvents='none';
+}
+
+/* ══════════════════ Y/N TOGGLE + EXPAND ══════════════════ */
+function pickToggle(key,val){
+  document.getElementById(key+'-yes').className='tog'+(val==='yes'?' yes-sel':'');
+  document.getElementById(key+'-no').className='tog'+(val==='no'?' no-sel':'');
+  document.getElementById(key+'-expand').className='expand-panel'+(val==='yes'?'':' hidden');
+}
+
+/* ══════════════════ PROVIDER SEARCH ══════════════════ */
+const PROVIDERS=[
+  {name:'Harmony Wellness Clinic',practitioner:'Dr. Linda Park, RMT',address:'2250 Bloor St W, Toronto, ON M6S 1P3'},
+  {name:'Restore Physio',practitioner:'Jason Reeves, PT',address:'185 King St, Waterloo, ON N2J 1P2'},
+  {name:'Peak Acupuncture',practitioner:'Dr. Wei Chen, R.Ac',address:'330 Bay St, Toronto, ON M5H 2S8'},
+  {name:'Midtown Chiropractic',practitioner:'Dr. Sara Novak, DC',address:'900 Yonge St, Toronto, ON M4W 3P4'},
+  {name:'Oakville Massage & Wellness',practitioner:'Marie Dupont, RMT',address:'1500 Cornwall Rd, Oakville, ON L6J 0G3'},
+  {name:'Northgate Physiotherapy',practitioner:'Ahmed Tariq, PT',address:'4040 Finch Ave E, Scarborough, ON M1S 4V5'},
+];
+const RECENT_IDX=0;
+let provTimer=null;
+
+function provFocus(){
+  const input=document.getElementById('prov-name');
+  const dropdown=document.getElementById('prov-results');
+  if(input.value.trim().length>=2)return;
+  const p=PROVIDERS[RECENT_IDX];
+  dropdown.innerHTML=`
+    <div class="prov-recent-hdr">Recent</div>
+    <div class="prov-result" onclick="provSelect(${RECENT_IDX})">
+      <div class="prov-result-name">${p.name}</div>
+      <div class="prov-result-addr">${p.practitioner} &mdash; ${p.address}</div>
+    </div>
+    <div class="prov-result" onclick="provSelectNotListed()" style="border-top:1px solid #e8e8ea">
+      <div class="prov-result-name" style="color:#6e6e73;font-weight:400">Not listed</div>
+      <div class="prov-result-addr">Enter provider details manually</div>
+    </div>`;
+  dropdown.style.display='block';
+}
+
+function provSearch(val){
+  const dropdown=document.getElementById('prov-results');
+  clearTimeout(provTimer);
+  const q=val.trim().toLowerCase();
+  if(q.length<2){provFocus();return;}
+  provTimer=setTimeout(()=>{
+    const matched=PROVIDERS.map((p,i)=>({p,i})).filter(({p})=>
+      p.name.toLowerCase().includes(q)||p.address.toLowerCase().includes(q)||p.practitioner.toLowerCase().includes(q)
+    );
+    let rows=matched.map(({p,i})=>`
+      <div class="prov-result" onclick="provSelect(${i})">
+        <div class="prov-result-name">${p.name}</div>
+        <div class="prov-result-addr">${p.practitioner} &mdash; ${p.address}</div>
+      </div>`);
+    rows.push(`
+      <div class="prov-result" onclick="provSelectNotListed()" style="border-top:1px solid #e8e8ea">
+        <div class="prov-result-name" style="color:#6e6e73;font-weight:400">Not listed</div>
+        <div class="prov-result-addr">Enter provider details manually</div>
+      </div>`);
+    dropdown.innerHTML=rows.join('');
+    dropdown.style.display='block';
+  },280);
+}
+
+function provSelect(idx){
+  document.getElementById('prov-results').style.display='none';
+  const p=PROVIDERS[idx];
+  document.getElementById('prov-name').value=p.name;
+  document.getElementById('prov-practitioner').value=p.practitioner;
+  document.getElementById('prov-address').value=p.address;
+}
+
+function provSelectNotListed(){
+  document.getElementById('prov-results').style.display='none';
+  document.getElementById('prov-name').value='';
+  document.getElementById('prov-practitioner').value='';
+  document.getElementById('prov-address').value='';
+  document.getElementById('prov-practitioner').focus();
+}
+
+document.addEventListener('click',e=>{
+  const inp=document.getElementById('prov-name');
+  const dropdown=document.getElementById('prov-results');
+  if(inp&&dropdown&&!inp.closest('.field-group').contains(e.target)){
+    dropdown.style.display='none';
+  }
+});
+
+/* ══════════════════ RESET ══════════════════ */
+function resetAll(){
+  document.getElementById('rec-ok').classList.remove('vis');
+  disable('upload-cta');
+  document.getElementById('prov-name').value='';
+  document.getElementById('prov-practitioner').value='';
+  document.getElementById('prov-address').value='';
+  document.getElementById('prov-results').style.display='none';
+  const ack=document.getElementById('ack');
+  if(ack)ack.checked=false;
+  pickToggle('cob','no');pickToggle('mva','no');pickToggle('wsib','no');
+}
+
+// Set max date on treatment date
+const todayStr=new Date().toISOString().split('T')[0];
+['tx-date','accident-date'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.setAttribute('max',todayStr);
+});
+</script>
+</body>
+</html>
